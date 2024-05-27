@@ -3,7 +3,7 @@
         <div v-for="(item, index) in targets" :key="index" class="target">
             <div class="backgroundimg"></div>
             <div class="actions">
-                <div class="button-border">执行</div>
+                <div class="button-border" @click="action(item)">执行</div>
             </div>
         </div>
     </div>
@@ -17,6 +17,11 @@ export default {
     data: function () {
         return {
             targets: [{ frame: [], conf: [] },{ frame: [], conf: [] }]
+        }
+    },
+    methods:{
+        action(item){
+
         }
     }
 }

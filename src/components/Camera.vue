@@ -18,7 +18,7 @@ export default {
 </script>
 <style scoped>
 .frame{
-    padding: 20px 10px;
+    padding: 0px;
 }
 .video-view{
     width:640px;

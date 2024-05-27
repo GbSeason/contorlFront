@@ -35,17 +35,47 @@ import TargetList from "@/components/TargetList.vue"
 export default {
   name: "Home",
   components: {
-    Status,CameraView,Control,RTInfo,TargetList
+    Status, CameraView, Control, RTInfo, TargetList
   },
   data() {
     return {
       text: "",
-    };
+      socket: null,
+      SID: null,
+      messageType: {
+        msg: "message",
+        video: "video",
+        broadcast:'broadcast'
+      }
+    }
+  },
+  mounted() {
+    this.socketOpen()
+  },
+  methods: {
+    socketOpen() {
+      this.socket = io();
+      this.socket.on('response_fail', ()=>{
+        console.log("Fail received.")
+      });
+      this.socket.on('connected', (data)=>{
+        console.log("connected sid==>"+data.sid)
+        this.SID = data.sid
+      });
+      
+    },
+    socketSendmsg(type,msg) { // 发送消息
+      if (this.socket) {
+        this.socket.emit(type, msg);
+      }
+    },
+
   },
 };
 </script>
 <style scoped>
-.bottom-line{
+.bottom-line {
   border-bottom: 1px solid #afafaf;
 }
 </style>
+
