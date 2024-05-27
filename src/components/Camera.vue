@@ -1,28 +1,103 @@
 <template>
-    <div class="frame">
-        <img :src="videoContent" class="video-view">
-    </div>
+  <div class="frame" id="videoFrameBox">
+    <img :src="videoContent" class="video-view" id="videoImageTag" />
+  </div>
 </template>
 <script>
 export default {
-    name: 'cameraview',
-    props: {
-
+  name: "cameraview",
+  props: ['parent'],
+  data: function () {
+    return {
+      videoContent: null,
+      imgTag: null,
+      imgFrame: null,
+      Xoff: 0,
+      Yoff: 0,
+      targetsDivBoxs: [],
+    };
+  },
+  mounted() {
+    this.imgTag = document.getElementById("videoImageTag");
+    this.imgFrame = document.getElementById("videoFrameBox");
+  },
+  methods: {
+    setVideo(data) {
+      const blob = new Blob([data], { type: "image/jpeg" });
+      this.videoContent = URL.createObjectURL(blob);
     },
-    data: function () {
-        return {
-            videoContent:null
+    clearBoxs() {
+      this.targetsDivBoxs.forEach((item) => {
+        this.imgFrame.removeChild(item);
+      });
+      this.targetsDivBoxs = [];
+    },
+    setBox(data) {
+      this.clearBoxs();
+      if (data.length > 2) {
+        this.Xoff = this.imgTag.clientLeft;
+        this.Yoff = this.imgTag.clientTop;
+        //[{"frame": [[522.5556640625, 80.27911376953125, 28.788330078125, 38.64739990234375]], "conf": [0.27099180221557617]}]
+        let datas = JSON.parse(data);
+        if (datas && datas.length > 0) {
+          datas.forEach((element) => {
+            element.frame.forEach((item, index) => {
+              let entity = { frame: [], conf: 0 };
+              entity.frame = item;
+              entity.conf = element.conf[index];
+              this.addTargetBox(entity, index);
+            });
+          });
         }
-    }
-}
+      }
+    },
+    addTargetBox(box, index) {
+      var newDiv = document.createElement("div");
+      // 设置新div的样式或属性
+      let x_ = box.frame[0] - box.frame[2] / 2;
+      let y_ = box.frame[1] - box.frame[3] / 2;
+      let x = this.Xoff + x_;
+      let y = this.Yoff + y_;
+      let width = box.frame[2];
+      let height = box.frame[3];
+      newDiv.style.width = `${width}px`;
+      newDiv.style.height = `${height}px`;
+      newDiv.style.top = `${y}px`;
+      newDiv.style.left = `${x}px`;
+      newDiv.style.color = `red`;
+      newDiv.style.position = "absolute";
+      newDiv.style.border = "1px solid #FF0000";
+      newDiv.innerText = `${index + 1}:${box.conf.toFixed(1)}`;
+      // 将新div添加到父div中
+      this.imgFrame.appendChild(newDiv);
+      this.targetsDivBoxs.push(newDiv);
+      let imgCopy = this.cropImage(x_, y_, width, height);
+      this.parent.drawImageToList(imgCopy,index)
+    },
+    cropImage(x, y, width, height) {
+      // 创建一个Canvas元素
+      var canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      // 获取Canvas上下文
+      var ctx = canvas.getContext("2d");
+      // 绘制图片的指定区域
+      ctx.drawImage(this.imgTag, x, y, width, height, 0, 0, width, height);
+      // 将Canvas转换为Base64编码的图片
+      var base64Image = canvas.toDataURL("image/jpg");
+      return base64Image;
+    },
+  },
+};
 </script>
 <style scoped>
-.frame{
-    padding: 0px;
+.frame {
+  padding: 0px;
+  position: relative;
 }
-.video-view{
-    width:640px;
-    height: 480px;
-    border: 1px solid #afafaf;
+.video-view {
+  width: 640px;
+  height: 480px;
+  border: 1px solid #afafaf;
 }
 </style>

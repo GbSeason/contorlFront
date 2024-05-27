@@ -7,10 +7,10 @@
     </el-row>
     <el-row>
       <el-col :span="8">
-        <CameraView></CameraView>
+        <CameraView ref="cameraView" :parent="this"></CameraView>
       </el-col>
       <el-col :span="16">
-        <TargetList></TargetList>
+        <TargetList ref="targetListView" :parent="this"></TargetList>
       </el-col>
     </el-row>
     <el-row>
@@ -27,15 +27,19 @@
 <script>
 // @ is an alias to /src
 import Status from "@/components/Status.vue";
-import CameraView from "@/components/Camera.vue"
-import Control from "@/components/Control.vue"
-import RTInfo from "@/components/RTInfo.vue"
-import TargetList from "@/components/TargetList.vue"
+import CameraView from "@/components/Camera.vue";
+import Control from "@/components/Control.vue";
+import RTInfo from "@/components/RTInfo.vue";
+import TargetList from "@/components/TargetList.vue";
 
 export default {
   name: "Home",
   components: {
-    Status, CameraView, Control, RTInfo, TargetList
+    Status,
+    CameraView,
+    Control,
+    RTInfo,
+    TargetList,
   },
   data() {
     return {
@@ -44,32 +48,57 @@ export default {
       SID: null,
       messageType: {
         msg: "message",
+        getVideo: "getVideo",
         video: "video",
-        broadcast:'broadcast'
-      }
-    }
+        broadcast: "broadcast",
+        connected: "connected",
+        findTargets: "findTargets",
+      },
+      getVideoLoopId: null,
+      currentImageData: null,
+    };
   },
   mounted() {
-    this.socketOpen()
+    this.socketOpen();
   },
   methods: {
     socketOpen() {
       this.socket = io();
-      this.socket.on('response_fail', ()=>{
-        console.log("Fail received.")
+      this.socket.on("response_fail", () => {
+        console.log("Fail received.");
       });
-      this.socket.on('connected', (data)=>{
-        console.log("connected sid==>"+data.sid)
-        this.SID = data.sid
+      this.socket.on(this.messageType.connected, (data) => {
+        console.log("connected sid==>" + data.sid);
+        this.SID = data.sid;
+        this.getVideoLoop();
       });
-      
+      this.socket.on(this.messageType.video, (data) => {
+        if (data) {
+          this.currentImageData = data;
+          this.$refs.cameraView.setVideo(data);
+        }
+      });
+      this.socket.on(this.messageType.findTargets, (data) => {
+        console.log("find Targets", data);
+        this.$refs.targetListView.showTargets(data);
+        this.$refs.cameraView.setBox(data);
+      });
     },
-    socketSendmsg(type,msg) { // 发送消息
+    drawImageToList(imgCopy, index) {
+      //截取的画面绘制到列表中
+      this.$refs.targetListView.setListImageBoxSrc(imgCopy,index);
+    },
+    getVideoLoop() {
+      this.getVideoLoopId = setInterval(() => {
+        this.socketSendmsg(this.messageType.getVideo, "");
+      }, 50);
+    },
+    socketSendmsg(type, msg) {
+      // 发送消息
       if (this.socket) {
         this.socket.emit(type, msg);
       }
     },
-
   },
 };
 </script>
