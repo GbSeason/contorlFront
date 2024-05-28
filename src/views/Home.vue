@@ -18,7 +18,7 @@
         <RTInfo></RTInfo>
       </el-col>
       <el-col :span="10">
-        <Control></Control>
+        <Control :parent="this"></Control>
       </el-col>
     </el-row>
   </div>
@@ -96,6 +96,7 @@ export default {
     socketSendmsg(type, msg) {
       // 发送消息
       if (this.socket) {
+        console.log(type,msg);
         this.socket.emit(type, msg);
       }
     },
