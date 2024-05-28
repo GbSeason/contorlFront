@@ -42,6 +42,15 @@ export default {
         }
       ]
     }
+  },
+  methods:{
+    setStatus(name,status){
+      this.statusList.forEach(item=>{
+        if(item.name == name){
+          item.status = status
+        }
+      })
+    },
   }
 }
 </script>

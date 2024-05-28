@@ -2,7 +2,7 @@
     <div class="frame">
         <el-row>
             <el-col :span="8">
-
+                <el-button @click="getMotoInfoLoop">GET INFO</el-button>
             </el-col>
             <el-col :span="8">
                 <div class="control-frame">
@@ -33,19 +33,33 @@ export default {
     props: ['parent'],
     data: function () {
         return {
+            keyDown:false,
             normalColor: "#64d4b8",
             overColor: "#e49b48",
             downColor: "#f16560",
             intervalIds: [],
-            directionCodes: { up: 0, right: 1, down: 2, left: 3, front: 4, back: 5 },
+            directionCodes: { up: "0", right: "1", down: "2", left: "3", front: "4", back: "5" },
+            getMotoIntervalId:[]
         }
     },
     mounted() {
         this.initControl();
         this.initControlMouse();
+        this.getMotoInfoLoop();
     },
     methods: {
+        getMotoInfoLoop(){
+                this.parent.socketSendmsg("message","info")
+            // this.getMotoIntervalId.forEach(item=>{
+            //     clearInterval(item);
+            // })
+            // let intervalId = setInterval(() => {
+            //     this.parent.socketSendmsg("message","info")
+            // }, 3000)
+            // this.getMotoIntervalId.push(intervalId)
+        },
         startAction(direction) {
+            this.stopAction()
             // 0:up  1:right 2:down 3:left 4:front 5:back
             let intervalId = setInterval(() => {
                 this.parent.socketSendmsg("action",direction)
@@ -60,7 +74,7 @@ export default {
         addListener(dom) {
             dom.addEventListener("mousedown", (event) => {
                 event.target.style.backgroundColor = this.downColor;
-                this.startAction(event.target.type)
+                this.startAction(event.target.getAttribute("type"))
             })
             dom.addEventListener("mouseup", (event) => {
                 event.target.style.backgroundColor = this.overColor;
@@ -88,6 +102,10 @@ export default {
         },
         initControl() {
             document.addEventListener('keydown', (event) => {
+                if(this.keyDown){
+                    return;
+                }
+                this.keyDown = true;
                 const keys = document.getElementById('direction-keys').children;
                 switch (event.keyCode) {
                     case 37: // left
@@ -118,6 +136,7 @@ export default {
             });
 
             document.addEventListener('keyup', (event) => {
+                this.keyDown = false;
                 const keys = document.getElementById('direction-keys').children;
                 this.stopAction()
                 switch (event.keyCode) {

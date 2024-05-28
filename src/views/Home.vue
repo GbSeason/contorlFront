@@ -2,7 +2,7 @@
   <div class="home">
     <el-row class="bottom-line">
       <el-col :span="24">
-        <Status />
+        <Status ref="statusView" />
       </el-col>
     </el-row>
     <el-row class="bottom-line">
@@ -51,6 +51,7 @@ export default {
         broadcast: "broadcast",
         connected: "connected",
         findTargets: "findTargets",
+        motoInfo: "info",
       },
       getVideoLoopId: null,
       currentImageData: null,
@@ -79,15 +80,22 @@ export default {
       });
       this.socket.on(this.messageType.video, (data) => {
         if (data) {
+          this.$refs.statusView.setStatus("camera",1)
           this.currentImageData = data;
           this.$refs.cameraView.setVideo(data);
+        }else{
+          this.$refs.statusView.setStatus("camera",0)
         }
       });
       this.socket.on(this.messageType.findTargets, (data) => {
-        console.log("find Targets", data);
+        // console.log("find Targets", data);
         this.$refs.targetListView.showTargets(data);
         this.$refs.cameraView.setBox(data);
       });
+      this.socket.on(this.messageType.motoInfo, (data) => {
+        console.log("motoInfo", data);
+      });
+      
     },
     drawImageToList(imgCopy, index) {
       //截取的画面绘制到列表中
@@ -101,7 +109,7 @@ export default {
     socketSendmsg(type, msg) {
       // 发送消息
       if (this.socket) {
-        console.log(type,msg);
+        // console.log(type,msg);
         this.socket.emit(type, msg);
       }
     },
