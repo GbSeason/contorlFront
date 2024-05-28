@@ -5,11 +5,9 @@
         <Status />
       </el-col>
     </el-row>
-    <el-row>
-      <el-col :span="8">
+    <el-row class="bottom-line">
+      <el-col :span="24" class="center-middle">
         <CameraView ref="cameraView" :parent="this"></CameraView>
-      </el-col>
-      <el-col :span="16">
         <TargetList ref="targetListView" :parent="this"></TargetList>
       </el-col>
     </el-row>
@@ -60,8 +58,15 @@ export default {
   },
   mounted() {
     this.socketOpen();
+    this.resizeBody();
+    window.addEventListener("resize", () => {
+      this.resizeBody();
+    })
   },
   methods: {
+    resizeBody() {
+      document.getElementById("app").style.height = `${window.innerHeight}px`;
+    },
     socketOpen() {
       this.socket = io();
       this.socket.on("response_fail", () => {
@@ -104,6 +109,12 @@ export default {
 };
 </script>
 <style scoped>
+.home{
+  height: 100%;
+}
+.center-middle{
+  display: flex;
+}
 .bottom-line {
   border-bottom: 1px solid #afafaf;
 }

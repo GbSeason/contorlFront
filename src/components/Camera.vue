@@ -94,10 +94,12 @@ export default {
 .frame {
   padding: 0px;
   position: relative;
+  width: 640px;
+  height: 480px;
 }
 .video-view {
   width: 640px;
   height: 480px;
-  border: 1px solid #afafaf;
+  /* border: 1px solid #afafaf; */
 }
 </style>
