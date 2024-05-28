@@ -177,10 +177,12 @@ export default {
 
 #front-button {
     background-color: #64d4b8;
+    cursor: pointer;
 }
 
 #back-button {
     background-color: #64d4b8;
+    cursor: pointer;
 }
 
 .quarter {
