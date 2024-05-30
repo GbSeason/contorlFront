@@ -33,13 +33,14 @@ export default {
     props: ['parent'],
     data: function () {
         return {
-            keyDown:false,
+            keyDown: false,
             normalColor: "#64d4b8",
             overColor: "#e49b48",
             downColor: "#f16560",
             intervalIds: [],
             directionCodes: { up: "0", right: "1", down: "2", left: "3", front: "4", back: "5" },
-            getMotoIntervalId:[]
+            getMotoIntervalId: [],
+            timeStemp: 0
         }
     },
     mounted() {
@@ -48,8 +49,8 @@ export default {
         this.getMotoInfoLoop();
     },
     methods: {
-        getMotoInfoLoop(){
-                this.parent.socketSendmsg("message","info")
+        getMotoInfoLoop() {
+            this.parent.socketSendmsg("message", "info")
             // this.getMotoIntervalId.forEach(item=>{
             //     clearInterval(item);
             // })
@@ -61,15 +62,19 @@ export default {
         startAction(direction) {
             this.stopAction()
             // 0:up  1:right 2:down 3:left 4:front 5:back
-            let intervalId = setInterval(() => {
-                this.parent.socketSendmsg("action",direction)
-            }, 20)
-            this.intervalIds.push(intervalId)
+            // let intervalId = setInterval(() => {
+            this.parent.socketSendmsg("action", direction)
+            // }, 20)
+            // this.intervalIds.push(intervalId)
         },
         stopAction() {
-            this.intervalIds.forEach(item=>{
-                clearInterval(item);
-            })
+            if (+new Date() - this.timeStemp > 5) {
+                this.parent.socketSendmsg("stopAction", "stopAction")
+            }
+            this.timeStemp = +new Date()
+            // this.intervalIds.forEach(item=>{
+            //     clearInterval(item);
+            // })
         },
         addListener(dom) {
             dom.addEventListener("mousedown", (event) => {
@@ -102,7 +107,7 @@ export default {
         },
         initControl() {
             document.addEventListener('keydown', (event) => {
-                if(this.keyDown){
+                if (this.keyDown) {
                     return;
                 }
                 this.keyDown = true;
