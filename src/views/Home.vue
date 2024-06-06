@@ -45,13 +45,15 @@ export default {
       socket: null,
       SID: null,
       messageType: {
-        msg: "message",
-        getVideo: "getVideo",
-        video: "video",
-        broadcast: "broadcast",
-        connected: "connected",
-        findTargets: "findTargets",
-        motoInfo: "info",
+        msg: "message",//普通消息，暂未定义
+        getVideo: "getVideo",//获取当前视图
+        video: "video",//接收到视图
+        broadcast: "broadcast",//广播
+        connected: "connected",//连接成功
+        findTargets: "findTargets",//识别到目标
+        motoInfo: "info",//机械臂信息
+        action: "action",//执行动作
+        actionWork: "actionWork",//执行作业
       },
       getVideoLoopId: null,
       currentImageData: null,
@@ -105,6 +107,12 @@ export default {
       this.getVideoLoopId = setInterval(() => {
         this.socketSendmsg(this.messageType.getVideo, "");
       }, 50);
+    },
+    action(index){
+      // 执行时，需要按照一下步骤进行：1存储选择的所有box；2将选择的box传入后台；3后台记录所有选择的box，记录机械臂当前所有状态，4依次执行选择的box
+      // 目前为每次执行一个目标
+      box = this.$refs.cameraView.getBox(index);
+      this.socketSendmsg(this.messageType.actionWork, box);
     },
     socketSendmsg(type, msg) {
       // 发送消息

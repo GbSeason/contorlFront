@@ -15,6 +15,7 @@ export default {
       Xoff: 0,
       Yoff: 0,
       targetsDivBoxs: [],
+      targetsLocBoxs: [],
     };
   },
   mounted() {
@@ -31,6 +32,10 @@ export default {
         this.imgFrame.removeChild(item);
       });
       this.targetsDivBoxs = [];
+      this.targetsLocBoxs = [];
+    },
+    getBox(index){
+      return this.targetsLocBoxs[index]
     },
     setBox(data) {
       this.clearBoxs();
@@ -45,7 +50,8 @@ export default {
               let entity = { frame: [], conf: 0 };
               entity.frame = item;
               entity.conf = element.conf[index];
-              this.addTargetBox(entity, index);
+              box = this.addTargetBox(entity, index);
+              this.targetsLocBoxs.push(box)
             });
           });
         }
@@ -73,6 +79,7 @@ export default {
       this.targetsDivBoxs.push(newDiv);
       let imgCopy = this.cropImage(x_, y_, width, height);
       this.parent.drawImageToList(imgCopy,index)
+      return [x,y,width,height]
     },
     cropImage(x, y, width, height) {
       // 创建一个Canvas元素
