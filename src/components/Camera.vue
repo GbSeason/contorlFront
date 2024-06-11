@@ -50,7 +50,7 @@ export default {
               let entity = { frame: [], conf: 0 };
               entity.frame = item;
               entity.conf = element.conf[index];
-              box = this.addTargetBox(entity, index);
+              let box = this.addTargetBox(entity, index);
               this.targetsLocBoxs.push(box)
             });
           });

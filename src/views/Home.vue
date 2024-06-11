@@ -111,7 +111,7 @@ export default {
     action(index){
       // 执行时，需要按照一下步骤进行：1存储选择的所有box；2将选择的box传入后台；3后台记录所有选择的box，记录机械臂当前所有状态，4依次执行选择的box
       // 目前为每次执行一个目标
-      box = this.$refs.cameraView.getBox(index);
+      let box = this.$refs.cameraView.getBox(index);
       this.socketSendmsg(this.messageType.actionWork, box);
     },
     socketSendmsg(type, msg) {
