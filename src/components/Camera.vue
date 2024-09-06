@@ -6,7 +6,7 @@
 <script>
 export default {
   name: "cameraview",
-  props: ['parent'],
+  props: ["parent"],
   data: function () {
     return {
       videoContent: null,
@@ -34,8 +34,8 @@ export default {
       this.targetsDivBoxs = [];
       this.targetsLocBoxs = [];
     },
-    getBox(index){
-      return this.targetsLocBoxs[index]
+    getBox(index) {
+      return this.targetsLocBoxs[index];
     },
     setBox(data) {
       this.clearBoxs();
@@ -51,7 +51,7 @@ export default {
               entity.frame = item;
               entity.conf = element.conf[index];
               let box = this.addTargetBox(entity, index);
-              this.targetsLocBoxs.push(box)
+              this.targetsLocBoxs.push(box);
             });
           });
         }
@@ -77,22 +77,25 @@ export default {
       // 将新div添加到父div中
       this.imgFrame.appendChild(newDiv);
       this.targetsDivBoxs.push(newDiv);
-      let imgCopy = this.cropImage(x_, y_, width, height);
-      this.parent.drawImageToList(imgCopy,index)
-      return [x,y,width,height]
+      this.cropImage(x_, y_, width, height, index);
+      return [x, y, width, height];
     },
-    cropImage(x, y, width, height) {
+    cropImage(x, y, width, height, index) {
       // 创建一个Canvas元素
-      var canvas = document.createElement("canvas");
+      let canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
       // 获取Canvas上下文
-      var ctx = canvas.getContext("2d");
-      // 绘制图片的指定区域
-      ctx.drawImage(this.imgTag, x, y, width, height, 0, 0, width, height);
-      // 将Canvas转换为Base64编码的图片
-      var base64Image = canvas.toDataURL("image/jpg");
-      return base64Image;
+      let ctx = canvas.getContext("2d");
+      let img = new Image();
+      img.src = this.videoContent;
+      img.onload = () => {
+        // 绘制图片的指定区域
+        ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+        // 将Canvas转换为Base64编码的图片
+        let base64Image = canvas.toDataURL("image/jpg");
+        this.parent.drawImageToList(base64Image, index);
+      };
     },
   },
 };
